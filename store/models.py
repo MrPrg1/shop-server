@@ -38,12 +38,19 @@ class Product(BaseModel):
     def __str__(self):
         return self.name
     
-    
+CHOICES_NAME = [
+    (1, 'percent'),
+    (2, 'amount'),
+]
+
 class Coupon(BaseModel):
     code = models.CharField(max_length=10, unique=True)
     discount = models.DecimalField(decimal_places=2, max_digits=20)
-    discount_type = models.CharField(max_length=40)
+    discount_type = models.IntegerField(choices=CHOICES_NAME)
     active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.code
 
 
 class ProductOrder(BaseModel):
@@ -51,6 +58,8 @@ class ProductOrder(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.SmallIntegerField(default=1)
 
+    def __str__(self):
+        return self.product.name
 
 
 
@@ -60,7 +69,9 @@ class Address(BaseModel):
     phone = models.CharField(max_length=15)
     address = models.CharField(max_length=100)
 
-
+    def __str__(self):
+        return self.name
+    
 
 class Order(BaseModel):
     user = models.ForeignKey(BaseUser, on_delete=models.CASCADE)
@@ -69,7 +80,8 @@ class Order(BaseModel):
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
 
-
+    def __str__(self):
+        return self.user.username
 
 
 class Comment(BaseModel):
@@ -78,7 +90,8 @@ class Comment(BaseModel):
     comment = models.TextField()
     to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
 
-
+    def __str__(self):
+        return self.user.username
 
 class Favorit(BaseModel):
     user = models.ForeignKey(BaseUser, on_delete=models.CASCADE)
